@@ -23,7 +23,8 @@ let package = Package(
         ),
         .testTarget(
             name: "TorrentFileKitTests",
-            dependencies: ["TorrentFileKit"]
+            dependencies: ["TorrentFileKit"],
+            resources: [.copy("Resources")]
         ),
     ]
 )

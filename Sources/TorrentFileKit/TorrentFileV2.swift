@@ -6,7 +6,7 @@ struct TorrentFileV2: Codable {
         struct MultipleFileInfo {
             let length: Int
             let path: [String]
-            let piecesRoot: Data?
+            let piecesRoot: Data
         }
         struct RawMultipleFileInfo: Codable {
             let length: Int
@@ -32,7 +32,6 @@ struct TorrentFileV2: Codable {
             }
         }
 
-
         let name: String
         let pieceLength: Int
         let metaVersion: Int
@@ -55,7 +54,7 @@ struct TorrentFileV2: Codable {
                             let context = DecodingError.Context(codingPath: container.codingPath, debugDescription: "Multiple files at the same path!")
                             throw DecodingError.dataCorrupted(context)
                         } else {
-                            return [MultipleFileInfo(length: file.length, path: basePath, piecesRoot: file.piecesRoot)]
+                            return [MultipleFileInfo(length: file.length, path: basePath, piecesRoot: file.piecesRoot ?? Data())]
                         }
                     } else {
                         let nextLevelContainer = try container.nestedContainer(keyedBy: StringCodingKey.self, forKey: key)
@@ -81,7 +80,7 @@ struct TorrentFileV2: Codable {
                 for segment in file.path {
                     container = container.nestedContainer(keyedBy: StringCodingKey.self, forKey: StringCodingKey(stringValue: segment)!)
                 }
-                try container.encode(RawMultipleFileInfo(length: file.length, piecesRoot: file.piecesRoot), forKey: StringCodingKey(stringValue: "")!)
+                try container.encode(RawMultipleFileInfo(length: file.length, piecesRoot: file.length == 0 ? nil : file.piecesRoot), forKey: StringCodingKey(stringValue: "")!)
             }
         }
 
@@ -96,4 +95,10 @@ struct TorrentFileV2: Codable {
     let announce: String
     let info: InfoDictionary
     let pieceLayers: [String: String]
+
+    enum CodingKeys: String, CodingKey {
+        case announce
+        case info
+        case pieceLayers = "piece layers"
+    }
 }
