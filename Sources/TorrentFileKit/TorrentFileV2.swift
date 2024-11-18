@@ -1,6 +1,7 @@
 import BencodeKit
 import Foundation
 
+// See: https://www.bittorrent.org/beps/bep_0052.html
 struct TorrentFileV2: Codable {
     struct InfoDictionary: Codable {
         struct MultipleFileInfo {
@@ -15,20 +16,6 @@ struct TorrentFileV2: Codable {
             enum CodingKeys: String, CodingKey {
                 case length
                 case piecesRoot = "pieces root"
-            }
-        }
-        struct StringCodingKey: CodingKey {
-            var stringValue: String
-
-            init?(stringValue: String) {
-                self.stringValue = stringValue
-            }
-            init?(intValue: Int) {
-                return nil
-            }
-
-            var intValue: Int? {
-                return nil
             }
         }
 

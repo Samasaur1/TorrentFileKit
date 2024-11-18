@@ -3,12 +3,16 @@ import Foundation
 
 public struct TorrentFile: Decodable {
     public init(from decoder: any Decoder) throws {
-        if let v1 = try? TorrentFileV1(from: decoder) {
-            self.init(fromV1: v1)
-        } else if let v2 = try? TorrentFileV2(from: decoder) {
-            self.init(fromV2: v2)
-        } else {
-            let context = DecodingError.Context(codingPath: [], debugDescription: "Cannot decode torrent file v1 or v2")
+        switch try? VersionIdentifier(from: decoder).version {
+        case 2:
+            // torrent file v2
+            self.init(fromV2: try TorrentFileV2(from: decoder))
+        case nil:
+            // No "meta version" key in torrent file; assume version 1 (all other versions should have a value)
+            self.init(fromV1: try TorrentFileV1(from: decoder))
+        default:
+            // a torrent file version that we don't know
+            let context = DecodingError.Context(codingPath: [], debugDescription: "Unknown meta version in torrent file!")
             throw DecodingError.dataCorrupted(context)
         }
     }

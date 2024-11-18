@@ -1,6 +1,7 @@
 import BencodeKit
 import Foundation
 
+// See: https://www.bittorrent.org/beps/bep_0003.html
 struct TorrentFileV1: Codable {
     struct InfoDictionary: Codable {
         struct MultipleFileInfo: Codable {
